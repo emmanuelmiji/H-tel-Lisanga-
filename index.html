@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Hôtel Lisanga, 24 chambres face au fleuve Congo à Ngaliema, Kinshasa. Réservation en ligne.">
+<title>Hôtel Lisanga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: hotel site (hero, rooms grid, booking panel with live price) + manager console behind a tab bar */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#141c2b; --muted:#5a6578; --line:#d9dfe8;
+  --river:#16325c; --river-ink:#ffffff; --brass:#a87a2a; --brass-soft:#f5ecdb; --on-brass:#ffffff;
+  --ok:#1d7448; --ok-soft:#e0f1e7; --warn:#9a6200; --warn-soft:#fcefd5; --bad:#b0352c; --bad-soft:#fae3e0; --info:#2457a6; --info-soft:#e2ebf8;
+  --display:"DM Serif Display", Georgia, "Times New Roman", serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --surface:#161e2d; --ink:#e8edf5; --muted:#9aa7bb; --line:#27324a;
+  --river:#1f427a; --river-ink:#ffffff; --brass:#d9aa5a; --brass-soft:#352a16; --on-brass:#1a1307;
+  --ok:#5ccf8c; --ok-soft:#14321f; --warn:#efb54f; --warn-soft:#382a10; --bad:#f08b80; --bad-soft:#3c1b18; --info:#86adf0; --info-soft:#17284a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#161e2d; --ink:#e8edf5; --muted:#9aa7bb; --line:#27324a;
+  --river:#1f427a; --river-ink:#ffffff; --brass:#d9aa5a; --brass-soft:#352a16; --on-brass:#1a1307;
+  --ok:#5ccf8c; --ok-soft:#14321f; --warn:#efb54f; --warn-soft:#382a10; --bad:#f08b80; --bad-soft:#3c1b18; --info:#86adf0; --info-soft:#17284a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:16px}
+h1,h2{font-family:var(--display);font-weight:400;line-height:1.08;text-wrap:balance;margin:0}
+h3{margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+
+.demobar{background:var(--ink);color:var(--bg);font-size:13px}
+.demobar .wrap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding-block:8px}
+.tabs{display:flex;gap:4px;background:color-mix(in srgb,var(--bg) 14%,transparent);padding:3px;border-radius:999px}
+.tabs button{border:0;background:transparent;color:inherit;padding:6px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--brass);color:var(--on-brass)}
+
+.hero{background:var(--river);color:var(--river-ink);padding-block:52px 44px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:auto -10% -40px -10%;height:120px;
+  background:repeating-linear-gradient(170deg,transparent 0 16px,color-mix(in srgb,var(--river-ink) 10%,transparent) 16px 17px);}
+.hero .wrap{position:relative;display:grid;gap:14px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:color-mix(in srgb,var(--brass) 70%,var(--river-ink))}
+.hero h1{font-size:clamp(2.6rem,7.5vw,4.4rem)}
+.hero p{max-width:54ch;margin:0;font-size:1.05rem;opacity:.92}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:8px;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn-brass{background:var(--brass);color:var(--on-brass)}
+.btn-ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.facts{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;opacity:.9}
+
+section{padding-block:44px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:20px}
+.sec-head h2{font-size:clamp(1.8rem,4.4vw,2.5rem)}
+.sec-head span{color:var(--muted);font-size:14px}
+
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.room{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.room .ph{aspect-ratio:16/9;max-width:100%;background:linear-gradient(160deg,var(--river),color-mix(in srgb,var(--river) 55%,var(--brass)));position:relative}
+.room .ph span{position:absolute;left:12px;bottom:10px;color:var(--river-ink);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.room .bd{padding:14px 16px 16px;display:grid;gap:6px;flex:1}
+.room h3{font-family:var(--display);font-weight:400;font-size:1.35rem}
+.room p{margin:0;color:var(--muted);font-size:14px}
+.room .price{margin-top:auto;padding-top:8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.room .price b{font-size:1.25rem;font-variant-numeric:tabular-nums}
+.room .price small{color:var(--muted)}
+.room button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 12px;font-weight:600;font-size:14px;cursor:pointer}
+
+.amen{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.amen span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px}
+
+.book{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px;align-items:start}
+@media (max-width:760px){.book{grid-template-columns:1fr}}
+.book-info p{color:var(--muted);margin:0 0 14px}
+.info-list{display:grid;gap:12px;margin:0;padding:0;list-style:none;font-size:15px}
+.info-list b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+form.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:460px){.row{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:14px;font-weight:600}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;font-weight:400}
+textarea{min-height:70px;resize:vertical}
+.quote{background:var(--brass-soft);border-radius:10px;padding:12px 14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:baseline}
+.quote span{font-size:14px}
+.quote b{font-size:1.35rem;font-variant-numeric:tabular-nums}
+.err{color:var(--bad);font-size:14px;margin:0}
+.success{background:var(--ok-soft);border-radius:16px;padding:22px;display:grid;gap:8px}
+.success h3{font-family:var(--display);font-weight:400;font-size:1.6rem;color:var(--ok)}
+.success p{margin:0}
+footer{border-top:1px solid var(--line);padding-block:24px;color:var(--muted);font-size:14px}
+
+.admin{padding-block:28px 48px}
+.login{max-width:380px;margin:40px auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:14px}
+.login h2{font-size:1.8rem}
+.login p{margin:0;color:var(--muted);font-size:14px}
+.admin-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.admin-top h2{font-size:2rem}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:1.7rem;font-variant-numeric:tabular-nums;line-height:1.15}
+.stat span{font-size:13px;color:var(--muted)}
+.occ{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:18px;display:grid;gap:10px}
+.occ h3{font-size:14px;font-weight:700}
+.occ-row{display:grid;grid-template-columns:140px minmax(0,1fr) 48px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:460px){.occ-row{grid-template-columns:100px minmax(0,1fr) 40px}}
+.bar{height:10px;background:var(--bg);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--brass);border-radius:999px}
+.occ-row em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:grid;gap:10px}
+.resa{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:6px 16px;align-items:center}
+@media (max-width:600px){.resa{grid-template-columns:90px minmax(0,1fr)}.resa .actions{grid-column:1/-1}}
+.when{border-right:1px solid var(--line);padding-right:12px;font-size:13px;color:var(--muted);line-height:1.35}
+.when b{display:block;color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.who{min-width:0}
+.who h3{font-size:1.02rem;font-weight:700;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.who p{margin:2px 0 0;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+.p-wait{background:var(--warn-soft);color:var(--warn)}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-in{background:var(--info-soft);color:var(--info)}
+.p-no{background:var(--bad-soft);color:var(--bad)}
+.tag-ex{font-size:11px;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:1px 6px;font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.sm{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 11px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink)}
+.sm.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.sm.in{background:var(--info);color:#fff;border-color:var(--info)}
+.sm.no{color:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:32px 16px;border:1px dashed var(--line);border-radius:14px}
+.note{font-size:13px;color:var(--muted);margin-top:18px}
+</style>
+</head>
+<body>
+
+<div class="demobar">
+  <div class="wrap">
+    <span>Démonstration · les réservations restent sur cet appareil</span>
+    <div class="tabs" role="tablist">
+      <button id="tab-site" role="tab" aria-selected="true">Site client</button>
+      <button id="tab-admin" role="tab" aria-selected="false">Espace gérant</button>
+    </div>
+  </div>
+</div>
+
+<main id="view-site">
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Ngaliema · Kinshasa · Vue sur le fleuve</span>
+      <h1>Hôtel Lisanga</h1>
+      <p>24 chambres climatisées face au fleuve Congo, groupe électrogène 24h/24, petit-déjeuner congolais et navette depuis l'aéroport de N'djili.</p>
+      <div class="hero-actions">
+        <a class="btn btn-brass" href="#reserver">Réserver une chambre</a>
+        <a class="btn btn-ghost" href="#chambres">Voir les chambres</a>
+      </div>
+      <div class="facts"><span>Arrivée dès 14h00 · Départ avant 12h00</span><span>Réception 24h/24</span><span>Cash · Carte · M-Pesa</span></div>
+    </div>
+  </header>
+
+  <section id="chambres">
+    <div class="wrap">
+      <div class="sec-head"><h2>Nos chambres</h2><span>Prix par nuit, petit-déjeuner inclus</span></div>
+      <div class="rooms" id="rooms"></div>
+      <div class="amen">
+        <span>Wi-Fi fibre</span><span>Électricité 24h/24</span><span>Piscine</span><span>Parking gardé</span><span>Restaurant et bar</span><span>Navette aéroport (25 $)</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="reserver">
+    <div class="wrap book">
+      <div class="book-info">
+        <div class="sec-head"><h2>Réserver</h2></div>
+        <p>Choisissez vos dates et votre chambre. La réception vous confirme par WhatsApp dans l'heure.</p>
+        <ul class="info-list">
+          <li><b>Adresse</b>Avenue de la Démocratie, Ngaliema, Kinshasa</li>
+          <li><b>Réception</b>+243 82 000 0000 (WhatsApp)</li>
+          <li><b>Paiement</b>À l'arrivée, ou acompte par mobile money pour les longs séjours</li>
+        </ul>
+      </div>
+      <div id="book-box">
+        <form class="card" id="book-form" novalidate>
+          <div class="row">
+            <label for="f-in">Arrivée<input id="f-in" type="date"></label>
+            <label for="f-out">Départ<input id="f-out" type="date"></label>
+          </div>
+          <div class="row">
+            <label for="f-room">Chambre<select id="f-room"></select></label>
+            <label for="f-guests">Personnes<select id="f-guests"></select></label>
+          </div>
+          <div class="row">
+            <label for="f-name">Nom complet<input id="f-name" autocomplete="name" placeholder="Ex. Christelle Kanku"></label>
+            <label for="f-phone">Téléphone / WhatsApp<input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+243 …"></label>
+          </div>
+          <label for="f-note">Demande particulière (facultatif)<textarea id="f-note" placeholder="Navette aéroport, arrivée tardive, lit bébé…"></textarea></label>
+          <div class="quote"><span id="q-detail">—</span><b id="q-total">—</b></div>
+          <p class="err" id="f-err" hidden></p>
+          <button class="btn btn-brass" type="submit">Envoyer la demande de réservation</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="wrap">Hôtel Lisanga · Hôtel fictif créé pour la démonstration</div></footer>
+</main>
+
+<main id="view-admin" hidden>
+  <div class="wrap admin">
+    <form class="login" id="login" novalidate>
+      <h2>Espace gérant</h2>
+      <p>Accès réservé à la réception. Code de la démo : <b>1234</b></p>
+      <label for="pin">Code d'accès<input id="pin" type="password" inputmode="numeric" autocomplete="off"></label>
+      <p class="err" id="pin-err" hidden>Code incorrect. Réessayez.</p>
+      <button class="btn btn-brass" type="submit">Entrer</button>
+    </form>
+
+    <div id="dash" hidden>
+      <div class="admin-top">
+        <h2>Réservations</h2>
+        <button class="sm" id="logout" type="button">Se déconnecter</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="s-arr">0</b><span>arrivées aujourd'hui</span></div>
+        <div class="stat"><b id="s-wait">0</b><span>à confirmer</span></div>
+        <div class="stat"><b id="s-occ">0</b><span>chambres occupées ce soir</span></div>
+        <div class="stat"><b id="s-rev">0 $</b><span>revenus à venir</span></div>
+      </div>
+      <div class="occ" id="occ"><h3>Occupation ce soir</h3></div>
+      <div class="filters" id="filters">
+        <button class="chip" data-f="upcoming" aria-pressed="true">À venir</button>
+        <button class="chip" data-f="today" aria-pressed="false">Arrivées du jour</button>
+        <button class="chip" data-f="wait" aria-pressed="false">À confirmer</button>
+        <button class="chip" data-f="all" aria-pressed="false">Toutes</button>
+      </div>
+      <div class="list" id="list"></div>
+      <p class="note">Dans la version livrée à l'hôtel, les demandes arrivent en direct depuis le site et la réception reçoit une notification.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  const KEY="lisanga-resas-v1",AUTH="lisanga-auth";
+  const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+  const $=id=>document.getElementById(id);
+  const pad=n=>String(n).padStart(2,"0");
+  const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const addDays=(n,from)=>{const d=from?new Date(from+"T12:00"):new Date();d.setDate(d.getDate()+n);return iso(d)};
+  const nights=(a,b)=>Math.round((new Date(b+"T12:00")-new Date(a+"T12:00"))/864e5);
+  const today=iso(new Date());
+  const money=n=>n.toLocaleString("fr-FR")+" $";
+  const fmt=s=>new Date(s+"T12:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"});
+  const fmtLong=s=>new Date(s+"T12:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+
+  const ROOMS=[
+    {id:"std",name:"Standard",price:65,stock:12,max:2,desc:"Lit double, douche, climatisation, 18 m². Côté jardin.",tag:"18 m²"},
+    {id:"sup",name:"Supérieure",price:90,stock:8,max:3,desc:"Grand lit, coin bureau, balcon, 24 m². Vue partielle sur le fleuve.",tag:"24 m² · balcon"},
+    {id:"suite",name:"Suite Fleuve",price:150,stock:2,max:2,desc:"Chambre et salon séparés, baignoire, terrasse face au fleuve Congo.",tag:"40 m² · terrasse"},
+    {id:"fam",name:"Appartement familial",price:180,stock:2,max:5,desc:"Deux chambres, cuisine équipée, séjour. Idéal familles et longs séjours.",tag:"60 m² · cuisine"}
+  ];
+  const room=id=>ROOMS.find(r=>r.id===id);
+
+  function seed(){return[
+    {id:"ex1",name:"Didier Mukendi",phone:"+243 81 222 3344",room:"sup",guests:2,in:today,out:addDays(3),note:"Arrivée vers 22h, vol Ethiopian",status:"ok",ex:true},
+    {id:"ex2",name:"Aline Nsimba",phone:"+243 99 555 6677",room:"std",guests:1,in:addDays(-1),out:addDays(2),note:"",status:"in",ex:true},
+    {id:"ex3",name:"Société Mbote Logistique",phone:"+243 82 333 9090",room:"std",guests:1,in:addDays(1),out:addDays(6),note:"Deux chambres pour une mission, facture au nom de la société",status:"wait",ex:true},
+    {id:"ex4",name:"Famille Kalala",phone:"+243 97 444 1212",room:"fam",guests:4,in:addDays(4),out:addDays(11),note:"Navette aéroport à l'arrivée",status:"wait",ex:true},
+    {id:"ex5",name:"Rebecca Mwamba",phone:"+243 84 777 0011",room:"suite",guests:2,in:today,out:addDays(2),note:"Lune de miel",status:"wait",ex:true}
+  ]}
+  let resas;try{resas=JSON.parse(store.get(KEY))}catch(e){resas=null}
+  if(!Array.isArray(resas))resas=seed();
+  const save=()=>store.set(KEY,JSON.stringify(resas));
+  const active=r=>r.status!=="no"&&r.status!=="out";
+  const overlaps=(r,a,b)=>r.in<b&&r.out>a;
+  const used=(roomId,a,b)=>resas.filter(r=>r.room===roomId&&active(r)&&overlaps(r,a,b)).length;
+
+  /* Tabs */
+  function show(v){
+    $("view-site").hidden=v!=="site";$("view-admin").hidden=v!=="admin";
+    $("tab-site").setAttribute("aria-selected",v==="site");$("tab-admin").setAttribute("aria-selected",v==="admin");
+    if(v==="admin")renderAdmin();window.scrollTo(0,0);
+  }
+  $("tab-site").onclick=()=>show("site");$("tab-admin").onclick=()=>show("admin");
+
+  /* Rooms */
+  $("rooms").innerHTML=ROOMS.map(r=>`<article class="room"><div class="ph"><span>${r.tag}</span></div><div class="bd">
+    <h3>${r.name}</h3><p>${r.desc}</p><p>Jusqu'à ${r.max} personne${r.max>1?"s":""}</p>
+    <div class="price"><span><b>${r.price} $</b> <small>/ nuit</small></span><button type="button" data-room="${r.id}">Choisir</button></div></div></article>`).join("");
+  $("rooms").addEventListener("click",e=>{const b=e.target.closest("button[data-room]");if(!b)return;
+    $("f-room").value=b.dataset.room;fillGuests();quote();document.getElementById("reserver").scrollIntoView({behavior:"smooth"})});
+
+  /* Form */
+  $("f-room").innerHTML=ROOMS.map(r=>`<option value="${r.id}">${r.name} · ${r.price} $</option>`).join("");
+  function fillGuests(){const m=room($("f-room").value).max,cur=+$("f-guests").value||2;
+    $("f-guests").innerHTML=Array.from({length:m},(_,i)=>`<option value="${i+1}"${i+1===Math.min(cur,m)?" selected":""}>${i+1} personne${i?"s":""}</option>`).join("")}
+  $("f-in").min=today;$("f-in").value=addDays(7);$("f-out").min=addDays(1);$("f-out").value=addDays(10);
+  fillGuests();
+  function quote(){
+    const a=$("f-in").value,b=$("f-out").value,r=room($("f-room").value);
+    if(!a||!b||b<=a){$("q-detail").textContent="Choisissez vos dates";$("q-total").textContent="—";return}
+    const n=nights(a,b);$("q-detail").textContent=`${r.name} · ${n} nuit${n>1?"s":""} × ${r.price} $`;$("q-total").textContent=money(n*r.price);
+  }
+  $("f-in").addEventListener("change",()=>{const a=$("f-in").value;if(a){$("f-out").min=addDays(1,a);if($("f-out").value<=a)$("f-out").value=addDays(1,a)}quote()});
+  ["f-out","f-room"].forEach(id=>$(id).addEventListener("change",()=>{if(id==="f-room")fillGuests();quote()}));
+  quote();
+
+  $("book-form").addEventListener("submit",e=>{
+    e.preventDefault();
+    const err=$("f-err"),a=$("f-in").value,b=$("f-out").value,rid=$("f-room").value,name=$("f-name").value.trim(),phone=$("f-phone").value.trim();
+    const fail=(m,id)=>{err.textContent=m;err.hidden=false;if(id)$(id).focus()};
+    if(!a||a<today)return fail("Choisissez une date d'arrivée à partir d'aujourd'hui.","f-in");
+    if(!b||b<=a)return fail("La date de départ doit être après la date d'arrivée.","f-out");
+    if(used(rid,a,b)>=room(rid).stock)return fail(`Plus de chambre ${room(rid).name} libre à ces dates. Essayez une autre chambre ou d'autres dates.`,"f-room");
+    if(name.length<2)return fail("Indiquez votre nom.","f-name");
+    if(phone.replace(/\D/g,"").length<9)return fail("Indiquez un numéro de téléphone valide.","f-phone");
+    err.hidden=true;
+    const r={id:"r"+Date.now(),name,phone,room:rid,guests:+$("f-guests").value,in:a,out:b,note:$("f-note").value.trim(),status:"wait"};
+    resas.push(r);save();
+    const n=nights(a,b),box=$("book-box");
+    box.innerHTML=`<div class="success" role="status"><h3>Demande envoyée</h3><p class="l1"></p><p class="l2"></p><p>La réception vous confirme par WhatsApp au <b class="ph"></b>.</p><div><button class="btn btn-ghost" id="again" type="button">Faire une autre réservation</button></div></div>`;
+    box.querySelector(".l1").textContent=`${room(rid).name} pour ${r.guests} personne${r.guests>1?"s":""}, du ${fmtLong(a)} au ${fmtLong(b)}.`;
+    box.querySelector(".l2").textContent=`${n} nuit${n>1?"s":""} · total estimé ${money(n*room(rid).price)}, payable à l'hôtel.`;
+    box.querySelector(".ph").textContent=phone;
+    $("again").onclick=()=>location.reload();
+  });
+
+  /* Admin */
+  let filter="upcoming",pendingDelete=null,authed=store.get(AUTH)==="1";
+  $("login").addEventListener("submit",e=>{e.preventDefault();
+    if($("pin").value==="1234"){authed=true;store.set(AUTH,"1");$("pin").value="";$("pin-err").hidden=true;renderAdmin()}else $("pin-err").hidden=false});
+  $("logout").onclick=()=>{authed=false;store.del(AUTH);renderAdmin()};
+  $("filters").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;filter=b.dataset.f;
+    document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===b));renderList()});
+  function renderAdmin(){$("login").hidden=authed;$("dash").hidden=!authed;if(authed)renderList()}
+
+  function renderList(){
+    const tonight=r=>active(r)&&r.status!=="wait"&&r.in<=today&&r.out>today;
+    $("s-arr").textContent=resas.filter(r=>r.in===today&&active(r)).length;
+    $("s-wait").textContent=resas.filter(r=>r.status==="wait"&&r.out>today).length;
+    const total=ROOMS.reduce((a,r)=>a+r.stock,0);
+    $("s-occ").textContent=resas.filter(tonight).length+" / "+total;
+    $("s-rev").textContent=money(resas.filter(r=>active(r)&&r.out>today).reduce((a,r)=>a+nights(r.in,r.out)*room(r.room).price,0));
+    const occ=$("occ");occ.innerHTML="<h3>Occupation ce soir (confirmées et présents)</h3>";
+    ROOMS.forEach(rm=>{const u=resas.filter(r=>r.room===rm.id&&tonight(r)).length,pct=Math.round(u/rm.stock*100);
+      const d=document.createElement("div");d.className="occ-row";
+      d.innerHTML=`<span>${rm.name}</span><div class="bar"><i style="width:${pct}%"></i></div><em>${u}/${rm.stock}</em>`;occ.appendChild(d)});
+
+    let rows=resas.slice();
+    if(filter==="upcoming")rows=rows.filter(r=>r.out>today&&r.status!=="no");
+    if(filter==="today")rows=rows.filter(r=>r.in===today);
+    if(filter==="wait")rows=rows.filter(r=>r.status==="wait");
+    rows.sort((a,b)=>a.in.localeCompare(b.in));
+    const list=$("list");list.innerHTML="";
+    if(!rows.length){list.innerHTML=`<div class="empty">Aucune réservation ici pour l'instant. Les nouvelles demandes du site apparaissent dans « À confirmer ».</div>`;return}
+    const PILL={wait:["p-wait","À confirmer"],ok:["p-ok","Confirmée"],in:["p-in","Client présent"],out:["p-ok","Parti"],no:["p-no","Annulée"]};
+    for(const r of rows){
+      const n=nights(r.in,r.out),rm=room(r.room),el=document.createElement("div");el.className="resa";
+      el.innerHTML=`<div class="when"><b>${r.in===today?"Aujourd'hui":fmt(r.in)}</b>→ ${fmt(r.out)}<br>${n} nuit${n>1?"s":""}</div>
+        <div class="who"><h3><span class="n"></span><span class="pill ${PILL[r.status][0]}">${PILL[r.status][1]}</span>${r.ex?'<span class="tag-ex">exemple</span>':""}</h3>
+        <p class="meta"></p><p class="nt"></p></div><div class="actions"></div>`;
+      el.querySelector(".n").textContent=r.name;
+      el.querySelector(".meta").textContent=`${rm.name} · ${r.guests} pers. · ${money(n*rm.price)} · ${r.phone}`;
+      const nt=el.querySelector(".nt");if(r.note)nt.textContent="« "+r.note+" »";else nt.remove();
+      const act=el.querySelector(".actions");
+      const btn=(label,cls,fn)=>{const b=document.createElement("button");b.type="button";b.className="sm "+cls;b.textContent=label;b.onclick=fn;act.appendChild(b)};
+      if(pendingDelete===r.id){
+        btn("Confirmer la suppression","no",()=>{resas=resas.filter(x=>x.id!==r.id);pendingDelete=null;save();renderList()});
+        btn("Garder","",()=>{pendingDelete=null;renderList()});
+      }else{
+        if(r.status==="wait")btn("Confirmer","ok",()=>setStatus(r,"ok"));
+        if(r.status==="ok")btn("Check-in","in",()=>setStatus(r,"in"));
+        if(r.status==="in")btn("Check-out","",()=>setStatus(r,"out"));
+        if(r.status==="wait"||r.status==="ok")btn("Annuler","no",()=>setStatus(r,"no"));
+        const wa=document.createElement("a");wa.className="sm";wa.textContent="WhatsApp";wa.target="_blank";wa.rel="noopener";
+        wa.href="https://wa.me/"+r.phone.replace(/\D/g,"")+"?text="+encodeURIComponent(`Bonjour ${r.name}, l'Hôtel Lisanga confirme votre réservation : ${rm.name}, du ${fmtLong(r.in)} au ${fmtLong(r.out)} (${n} nuit${n>1?"s":""}, ${money(n*rm.price)}). Au plaisir de vous accueillir !`);
+        act.appendChild(wa);
+        btn("Supprimer","",()=>{pendingDelete=r.id;renderList()});
+      }
+      list.appendChild(el);
+    }
+  }
+  function setStatus(r,s){r.status=s;save();renderList()}
+  if(location.hash==="#gerant")show("admin");
+})();
+</script>
+</body>
+</html>
